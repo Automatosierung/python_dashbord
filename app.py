@@ -14,7 +14,7 @@ df['day'] = df['new_starttime'].dt.day
 
 # Step 2: Set up the Dash app
 app = dash.Dash(__name__)
-
+server = app.server
 # Step 3: Layout of the app
 app.layout = html.Div(children=[
     html.H1(children='Dashboard'),
