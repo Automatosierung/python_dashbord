@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 
 # Step 1: Read the CSV file
-df = pd.read_csv(r'C:\Users\Vadim.Khablov\Downloads\ExportedFiles_8692edf1-0f2f-47de-8ed6-337ee1be6f4e\new_appointments.csv')
+df = pd.read_csv('new_appointments.csv')  # Use relative path
 
 # Convert the date columns to datetime
 df['new_starttime'] = pd.to_datetime(df['new_starttime'])
@@ -202,4 +202,4 @@ def update_selected_bezirk(clickData, current_selection):
     return None
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host='0.0.0.0', port=8050, debug=True)
