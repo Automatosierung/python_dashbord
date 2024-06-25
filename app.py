@@ -1,11 +1,44 @@
+import os
+import requests
 import pandas as pd
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 import plotly.express as px
 
-# Step 1: Read the CSV file
-df = pd.read_csv(r'C:\Users\Vadim.Khablov\Downloads\ExportedFiles_8692edf1-0f2f-47de-8ed6-337ee1be6f4e\new_appointments.csv')
+# Dataverse credentials from environment variables
+TENANT_ID = os.getenv('TENANT_ID')
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+RESOURCE_URL = 'https://org4384562c.api.crm16.dynamics.com'
+API_URL = f'{RESOURCE_URL}/api/data/v9.2/new_appointments'
+
+# Get access token
+def get_access_token(tenant_id, client_id, client_secret):
+    url = f'https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token'
+    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+    data = {
+        'client_id': client_id,
+        'scope': 'https://org4384562c.api.crm16.dynamics.com/.default',
+        'client_secret': client_secret,
+        'grant_type': 'client_credentials'
+    }
+    response = requests.post(url, headers=headers, data=data)
+    return response.json()['access_token']
+
+# Fetch data from Dataverse
+def fetch_data(api_url, token):
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Accept': 'application/json'
+    }
+    response = requests.get(api_url, headers=headers)
+    return response.json()
+
+token = get_access_token(TENANT_ID, CLIENT_ID, CLIENT_SECRET)
+data = fetch_data(API_URL, token)
+# Convert data to DataFrame
+df = pd.json_normalize(data['value'])
 
 # Convert the date columns to datetime
 df['new_starttime'] = pd.to_datetime(df['new_starttime'])
@@ -15,6 +48,7 @@ df['day'] = df['new_starttime'].dt.day
 # Step 2: Set up the Dash app
 app = dash.Dash(__name__)
 server = app.server
+
 # Step 3: Layout of the app
 app.layout = html.Div(children=[
     html.H1(children='Dashboard'),
