@@ -5,7 +5,10 @@ import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 import plotly.express as px
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 # Dataverse credentials from environment variables
 TENANT_ID = os.getenv('TENANT_ID')
 CLIENT_ID = os.getenv('CLIENT_ID')
